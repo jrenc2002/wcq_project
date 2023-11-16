@@ -10,6 +10,7 @@
   "dependencies": {
     "autoprefixer": "^10.4.16",
     "axios": "^1.6.2",
+    "echarts": "^5.4.3",
     "mqtt": "^5.2.2",
     "postcss": "^8.4.31",
     "sweetalert2": "^11.10.0",

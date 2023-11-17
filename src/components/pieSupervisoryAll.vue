@@ -1,6 +1,6 @@
 <template>
 
-  <div class=" w-full h-full flex  relative m-1">
+  <div class=" w-full  flex  relative m-1">
     <div class="panel w-full absolute"></div>
     <div class="w-[calc(100%-1rem)] h-[calc(100%-2rem)]  absolute m-2 flex flex-col">
       <div class="w-full h-12  flex flex item-center">

@@ -220,6 +220,11 @@
   "resolved" "https://registry.npmjs.org/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz"
   "version" "0.5.7"
 
+"@easydarwin/easyplayer@^5.1.1":
+  "integrity" "sha512-C7YSTY+ESmxL/n6qWZHP+9Rv5/ooJ6JVP8i8grUOgm3tQ6AHNE6VhctO7OWK1ye+ZygohWi50OVE+qNXbTbMNw=="
+  "resolved" "https://registry.npmmirror.com/@easydarwin/easyplayer/-/easyplayer-5.1.1.tgz"
+  "version" "5.1.1"
+
 "@eslint-community/eslint-utils@^4.2.0":
   "integrity" "sha512-1/sA4dwrzBAyeUoQ6oxahHKmrZvsnLCg4RfxW3ZFGGmQkSNQPFNLV9CUEFQP1x9EYXHTo5p6xdhZM1Ne9p/AfA=="
   "resolved" "https://registry.npmjs.org/@eslint-community/eslint-utils/-/eslint-utils-4.4.0.tgz"

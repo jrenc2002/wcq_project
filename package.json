@@ -9,9 +9,12 @@
   },
   "dependencies": {
     "@easydarwin/easyplayer": "^5.1.1",
+    "@headlessui/vue": "^1.7.16",
+    "@heroicons/vue": "^2.0.18",
     "autoprefixer": "^10.4.16",
     "axios": "^1.6.2",
     "echarts": "^5.4.3",
+    "flv.js": "^1.6.2",
     "mqtt": "^5.2.2",
     "pinia": "^2.1.7",
     "postcss": "^8.4.31",

@@ -15,16 +15,17 @@
           <div class="data  h-[100%] w-[80%] ">
             <div class=" w-full h-[50%] items-center justify-center flex flex-col gap-1">
               <div class="w-32 text-2xl text-white justify-start items-center flex">
-                1500
+                {{AppGlobal.dataSupervisoryTotality}}
               </div>
               <span class="flex  items-center w-32 padding-2 ">
-                <i class="icon-dot text-lg bg-[rgb(237,63,52)] opacity-100 rounded w-3 mr-2 " style="color: rgb(237,63,52)"></i>
+                <i class="icon-dot text-lg bg-[rgb(237,63,52)] opacity-100 rounded w-3 mr-2 "
+                   style="color: rgb(237,63,52)"></i>
                 <div class="text-xl text-[rgb(237,63,52)]">异常总数</div>
                         </span>
             </div>
             <div class=" w-full h-[50%] items-center justify-center flex flex-col gap-1">
               <div class="w-32 text-2xl text-white justify-start items-center flex">
-                1500
+                {{AppGlobal.dataSupervisoryStatusDay.statusSupervisoryAdd}}
               </div>
               <span class="flex  items-center w-32 padding-2 ">
                 <i class="icon-dot text-lg bg-[#006cff] opacity-100 rounded w-3 mr-2 " style="color: #006cff"></i>
@@ -44,8 +45,10 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, onMounted, onUnmounted, ref } from 'vue'
+import { defineProps, onMounted, onUnmounted, ref, watch } from 'vue'
 import { ECharts, EChartsOption, init } from 'echarts'
+
+import { useAppGlobal } from '@/store/AppGlobal'
 
 const props = defineProps<{ id: string }>()
 const chartDiv = ref<HTMLElement | null>(null)
@@ -56,6 +59,7 @@ let phases = ref()
 let alarmLimit = ref(0)
 let standardValue = ref(0)
 
+const AppGlobal = useAppGlobal();
 const updateChart = () => {
 
   const option: EChartsOption = {
@@ -69,10 +73,7 @@ const updateChart = () => {
       },
       left: 'center',
       top: 'bottom',
-      data: [
-        '异物',
-        '跑偏',
-      ]
+      data: AppGlobal.kindSupervisoryStatistics.statusSet
     },
     toolbox: {
       show: true,
@@ -99,20 +100,11 @@ const updateChart = () => {
       itemStyle: {
         borderRadius: 5
       },
-      // 数据集 value 数据的值 name 数据的名称
-      data: [
-        {
-          value: 1000,
-          name: '跑偏'
-        },
-        {
-          value: 500,
-          name: '异物'
-        },
-      ],
+      // 将kindSupervisoryStatistics的状态值导出为data
+      data: AppGlobal.kindSupervisoryStatistics.statusPieSupervisory,
       //文字调整
       label: {
-        fontSize: 25,
+        fontSize: 20,
         color: '#fff'
       },
       //引导线
@@ -130,6 +122,9 @@ const updateChart = () => {
   }
 }
 
+watch(() => AppGlobal.kindSupervisoryStatistics.statusPieSupervisory, () => {
+  updateChart()
+})
 onMounted(() => {
   setTimeout(() => {
     if (chartDiv.value) {
@@ -163,9 +158,11 @@ onUnmounted(() => {
   border-image: url(@/assets/image/border.png) 51 38 21 132;
   border-width: 2.125rem 1.583rem 0.875rem 5.5rem;
 }
+
 .icon-dot:before {
   content: "\e900";
 }
+
 .data {
   display: flex;
   flex-direction: column;

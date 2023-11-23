@@ -18,7 +18,7 @@
           <div class=" flow-root ">
             <div class="mx-auto max-w-7xl px-4">
               <table class="w-full text-left">
-                <thead>
+                <thead style="position: sticky; top: 0;">
                 <tr>
                   <th class="relative isolate py-3.5 pr-3 text-center text-sm font-semibold text-blue-400 justify-center items-center flex"
                       scope="col">
@@ -37,7 +37,7 @@
                 </tr>
                 </thead>
                 <tbody v-show="chanceContent">
-                <tr v-for="(info,index) in AppGlobal.dataSupervisoryStatus" :key="index" class="hover:bg-[rgb(40,41,63)] cursor-pointer">
+                <tr v-for="(info,index) in AppGlobal.dataSupervisoryStatus" :key="index" class="hover:bg-[rgb(40,41,63)] cursor-pointer" >
 
                   <td
                     class="hidden px-3 py-4 text-sm text-center text-gray-500 sm:table-cell justify-center items-center flex">
@@ -48,7 +48,7 @@
                     {{ info.alarm_name }}
                   </td>
                   <td
-                    class="hidden px-3 py-4 text-sm text-center text-gray-500 md:table-cell justify-center items-center flex">
+                    class="hidden px-3 py-4 text-sm text-center text-gray-500 md:table-cell justify-center items-center flex" @click="openMssage(info)">
                     {{ formatDateTime(info.datetime) }}
                   </td>
 
@@ -58,7 +58,7 @@
 
 
                 <tbody v-show="!chanceContent">
-                <tr v-for="(device,index) in AppGlobal.dataSupervisoryDevice" :key="index" class="hover:bg-[rgb(40,41,63)] cursor-pointer">
+                <tr v-for="(device,index) in AppGlobal.dataSupervisoryDevice" :key="index" class="hover:bg-[rgb(40,41,63)] cursor-pointer" >
 
                   <td
                     class="hidden px-3 py-4 text-sm text-center text-gray-500 sm:table-cell justify-center items-center flex">
@@ -71,10 +71,10 @@
                   <td
                     class="relative px-3 py-4 text-sm text-center text-gray-500 md:table-cell justify-center items-center flex">
                     <div class="flex justify-center items-center gap-2">
-                      <div class="w-2 hover:text-blue-500 hover:cursor-pointer" @click="pushWatchList(1,device.id,device.stream_url)" :class="[isWatched(device.id,1)?'text-blue-500':'text-white']">1</div>
-                      <div class="w-2 hover:text-blue-500 hover:cursor-pointer" @click="pushWatchList(2,device.id,device.stream_url)" :class="[isWatched(device.id,2)?'text-blue-500':'text-white']">2</div>
-                      <div class="w-2 hover:text-blue-500 hover:cursor-pointer" @click="pushWatchList(3,device.id,device.stream_url)" :class="[isWatched(device.id,3)?'text-blue-500':'text-white']">3</div>
-                      <div class="w-2 hover:text-blue-500 hover:cursor-pointer" @click="pushWatchList(4,device.id,device.stream_url)" :class="[isWatched(device.id,4)?'text-blue-500':'text-white']">4</div>
+                      <div class="w-2 hover:text-blue-500 hover:cursor-pointer" @click="pushWatchList(0,device.id-1,device.stream_url)" :class="[isWatched(device.id-1,0)?'text-blue-500':'text-white']">1</div>
+                      <div class="w-2 hover:text-blue-500 hover:cursor-pointer" @click="pushWatchList(1,device.id-1,device.stream_url)" :class="[isWatched(device.id-1,1)?'text-blue-500':'text-white']">2</div>
+                      <div class="w-2 hover:text-blue-500 hover:cursor-pointer" @click="pushWatchList(2,device.id-1,device.stream_url)" :class="[isWatched(device.id-1,2)?'text-blue-500':'text-white']">3</div>
+                      <div class="w-2 hover:text-blue-500 hover:cursor-pointer" @click="pushWatchList(3,device.id-1,device.stream_url)" :class="[isWatched(device.id-1,3)?'text-blue-500':'text-white']">4</div>
                     </div>
                   </td>
 
@@ -102,12 +102,12 @@ import { useAppGlobal } from '@/store/AppGlobal'
 import Swal from 'sweetalert2'
 
 const AppGlobal = useAppGlobal();
-const chanceContent = ref(false)
+let chanceContent = ref(false)
 // 检查AppGlobal.watchControl.watchList有没有一个设备id和当前设备id相同，如果有，说明当前设备正在被监控,他是响应式的
 const isWatched = computed(() => {
   return (deviceId, id) => {
-    if (AppGlobal.watchControl.watchList.length >= id && id > 0) {
-      return AppGlobal.watchControl.watchList[id - 1].id === deviceId;
+    if (AppGlobal.watchControl.watchList.length >= id && id >= 0) {
+      return AppGlobal.watchControl.watchList[id].id === deviceId;
     }
     return false;
   };
@@ -116,7 +116,7 @@ const isWatched = computed(() => {
 // 将视频源和视频ID更改到指定watchList里
 const pushWatchList = (id,deviceID,videoUrl) => {
   // 如果更改前发现当前设备被锁定，将取消更改
-  if(AppGlobal.watchControl.watchList[id-1].isLock){
+  if(AppGlobal.watchControl.watchList[id].isLock){
     let title, text
     title = '该窗口已被锁定'
     text = 'The window is locked.'
@@ -136,20 +136,19 @@ const pushWatchList = (id,deviceID,videoUrl) => {
   }
 
   // 先检查之前的watchList是否有相同的id，如果isLock为false，就删除path和id的数据
-  if(!AppGlobal.watchControl.watchList[id-1].isLock){
-    AppGlobal.watchControl.watchList[id-1].path = ''
-    AppGlobal.watchControl.watchList[id-1].id = ''
+  if(!AppGlobal.watchControl.watchList[id].isLock){
+    AppGlobal.watchControl.watchList[id].path = null
+    AppGlobal.watchControl.watchList[id].id = null
   }
   // 然后检查当要更改的设备id是否再watchlist有相同的id,如果有就将其清零
   for(let i=0;i<AppGlobal.watchControl.watchList.length;i++){
     if(AppGlobal.watchControl.watchList[i].id === deviceID){
-      AppGlobal.watchControl.watchList[i].path = ''
-      AppGlobal.watchControl.watchList[i].id = ''
+      AppGlobal.watchControl.watchList[i].path = null
+      AppGlobal.watchControl.watchList[i].id = null
     }
   }
-  AppGlobal.watchControl.watchList[id-1].path = videoUrl
-  AppGlobal.watchControl.watchList[id-1].id = deviceID
-  console.log('____________',AppGlobal.watchControl.watchList)
+  console.log(videoUrl,deviceID,id,'123')
+  AppGlobal.watchControl.watchList[id]= {path: videoUrl, id: deviceID, isLock: false}
 }
 
 function formatDateTime(datetime) {
@@ -164,6 +163,20 @@ function formatDateTime(datetime) {
   return `${year}年${month}月${day}日 ${hour}:${minute}:${second}`;
 }
 
+// 创建一个openMssage函数，打开弹窗
+const openMssage = (info) => {
+  console.log(info)
+  let title, text,html
+  title = '设备信息'
+  // 帮我配置个html，显示一张图片地址为info.pic_url，同时下面带着text，'设备名称：' + info.camera_name + '\n' + '报错问题：' + info.alarm_name + '\n' + '设备位置：' + info.location
+  html = '<img src="' + info.pic_url + '" style="width: 100%;height: 100%;border-radius: 0.5rem">'
+  Swal.fire({
+    title: title,
+    type: 'info',
+    html: html,
+    text: '设备名称：' + info.camera_name + '\n' + '报错问题：' + info.alarm_name + '\n' + '设备位置：' + info.location,
+  })
+}
 </script>
 
 <style scoped>

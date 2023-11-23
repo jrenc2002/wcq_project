@@ -31,7 +31,7 @@ const state = () => {
       // 今日监控情况
       statusSupervisory:0,
     },
-    // 监控总数
+    // 监控数据的总数
     dataSupervisoryTotality:0,
     // 饼图数据
     kindSupervisoryStatistics:{
@@ -63,6 +63,15 @@ const state = () => {
       watchList:[
         {
           // 监控设备id
+          id:0,
+          // 监控设备路由
+          path:"http://192.168.75.214/live?port=1935&app=myapp&stream=camera_1",
+          // 是否锁定
+          isLock:false,
+
+        },
+        {
+          // 监控设备id
           id:1,
           // 监控设备路由
           path:"http://192.168.75.214/live?port=1935&app=myapp&stream=camera_1",
@@ -82,15 +91,6 @@ const state = () => {
         {
           // 监控设备id
           id:3,
-          // 监控设备路由
-          path:"http://192.168.75.214/live?port=1935&app=myapp&stream=camera_1",
-          // 是否锁定
-          isLock:false,
-
-        },
-        {
-          // 监控设备id
-          id:4,
           // 监控设备路由
           path:"http://192.168.75.214/live?port=1935&app=myapp&stream=camera_1",
           // 是否锁定

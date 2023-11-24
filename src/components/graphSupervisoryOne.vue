@@ -4,7 +4,7 @@
     <div class="panel w-full absolute"></div>
     <div class="w-[calc(100%-1rem)] h-[calc(100%-2rem)]  absolute m-2 flex flex-col">
       <div class="w-full h-12  flex flex item-center">
-        <div class="text-xl  w-52 text-white  items-center flex justify-center">1号监控异常数统计</div>
+        <div class="text-xl  w-52 text-white  items-center flex justify-center">{{selectStatus}}号监控异常数统计</div>
         <Menu as="div" class="relative inline-block text-left  left-44 top-2">
           <div >
             <MenuButton class="inline-flex w-full justify-center  gap-x-1.5 rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-blue-600">
@@ -48,14 +48,10 @@ import { ECharts, EChartsOption, init } from 'echarts'
 import { useAppGlobal } from '@/store/AppGlobal'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { ChevronDownIcon } from '@heroicons/vue/20/solid'
-const props = defineProps<{ id: string }>()
+import axios from 'axios'
+import Swal from 'sweetalert2'
 const chartDiv = ref<HTMLElement | null>(null)
 let chartEch: ECharts | null = null
-let frequencies = ref()
-let amplitudes = ref()
-let phases = ref()
-let alarmLimit = ref(0)
-let standardValue = ref(0)
 const AppGlobal = useAppGlobal();
 const updateChart = () => {
 
@@ -112,7 +108,7 @@ const updateChart = () => {
     },
     series: [{
       name: 'area_ratio',
-      data: AppGlobal.dataRadioStatistics,
+      data: dataRadioStatistics.value,
       type: 'line',
       smooth: true,
       itemStyle: {
@@ -136,10 +132,12 @@ onMounted(() => {
           chartEch.resize()
         }
       })
-
+      changeDevice(4)
       updateChart()
+
     }
   }, 500) // 延迟 500 毫秒
+
 })
 
 onUnmounted(() => {
@@ -149,9 +147,67 @@ onUnmounted(() => {
   }
   window.removeEventListener('resize', updateChart)
 })
-watch(() => AppGlobal.dataRadioStatistics, () => {
-  updateChart()
-})
+
+const selectStatus=ref(4)
+const dataRadioStatistics=ref([])
+// 切换数据渲染的类型
+const changeDevice = (id: number) => {
+  const oldSelectStatus=selectStatus.value
+  selectStatus.value=id
+  const token=localStorage.getItem('token');
+  axios.get('http://192.168.75.214:8080/intelligent/getRTDatabyCamera/?time%20start=1697869600&camera_id='+id+'&time_end=1698984000', {
+      headers: {
+        authorization: `${token}`,
+      },
+    })
+    .then(response => {
+      if (response.status === 200) {
+        console.log(response.data.data)
+        // 判断有没有json_data.AreaRatio数据，或json_data数据或空数组
+        if (response.data.data.length === 0 || !response.data.data[0].json_data || !response.data.data[0].json_data.AreaRatio) {
+          selectStatus.value=oldSelectStatus
+          Swal.fire('数据错误', '所选没有AreaRatio', 'error')
+          return
+        }
+
+        interface Item {
+          "@timestamp": string;
+          json_data: {
+            AreaRatio: number;
+          };
+        }
+
+        interface Value {
+          value: [string, number];
+        }
+
+        const dataPoints = response.data.data
+          .map((item: Item) => {
+            return {
+              value: [
+                item["@timestamp"], // X轴：时间戳
+                item.json_data.AreaRatio // Y轴：AreaRatio
+              ]
+            } as Value;
+          })
+          .sort((a: Value, b: Value) => new Date(a.value[0]).getTime() - new Date(b.value[0]).getTime()); // 按照时间戳排序
+        dataRadioStatistics.value=dataPoints
+        updateChart()
+      } else {
+        Swal.fire('意外的状态码', `HTTP状态码: ${response.status}`, 'error')
+      }
+    })
+    .catch(error => {
+      if (error.response && error.response.status === 400) {
+        Swal.fire('服务器错误', error.message, 'error')
+      } else {
+        Swal.fire('网络错误', error.message, 'error')
+      }
+    })
+
+
+}
+
 </script>
 
 

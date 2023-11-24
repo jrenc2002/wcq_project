@@ -50,14 +50,9 @@ import { ECharts, EChartsOption, init } from 'echarts'
 
 import { useAppGlobal } from '@/store/AppGlobal'
 
-const props = defineProps<{ id: string }>()
 const chartDiv = ref<HTMLElement | null>(null)
 let chartEch: ECharts | null = null
-let frequencies = ref()
-let amplitudes = ref()
-let phases = ref()
-let alarmLimit = ref(0)
-let standardValue = ref(0)
+
 
 const AppGlobal = useAppGlobal();
 const updateChart = () => {

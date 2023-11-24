@@ -74,7 +74,6 @@ let isUpdating = false //其newFlv的资源是不可以被同时调用的
 watch(() => AppGlobal.watchControl.watchList, async (newVal) => {
   console.log('watchList改变',newVal)
   // 检验更改后的path是否不同
-
   newVal.forEach((element, index) => {
     // console.log(flvPlayer.value[index].statisticsInfo.url,index,'2131221')
     if (element.path === null||element.path !== flvPlayer.value[index].statisticsInfo.url) {
@@ -88,7 +87,10 @@ watch(() => AppGlobal.watchControl.watchList, async (newVal) => {
 // 监听dataSupervisoryDevice的更新
 watch(()=>AppGlobal.dataSupervisoryDevice,(newVal)=>{
   newVal.forEach((e,index)=>{
-    if (index<4&&AppGlobal.watchControl.watchList[index].id==index){
+
+    // 如果设备数据变化，就将watchList中的path更新
+    // 这个index小于3还是有用的，因为如果不加index就会出现watchList越界的问题
+    if (index<=3&&AppGlobal.watchControl.watchList[index].id==index){
       AppGlobal.watchControl.watchList[index].path=e.stream_url
     }
   })
